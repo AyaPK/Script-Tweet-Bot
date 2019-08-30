@@ -13,6 +13,9 @@ Don't worry about adapting lines to fall under the 280 character limit, the bot 
 
 Once the script.txt is set up, run main.py a couple of times to ensure the bot is tweeting as intended.
 
+tracking.json will handle the tracking of what has been tweeted, it calls the LineNum value to check what line was last tweeted, change this number to manually change where the bot tweets from.
+tracking.json also contains other useful information, including the current episode, the contents of the last tweet, and how many times it has successfully tweeted.
+
 Simply use your favourite automation method to tell main.py to run whenever you want it to run and let the program handle the rest.
 
 
