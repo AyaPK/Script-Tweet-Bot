@@ -5,10 +5,34 @@ import tweet
 
 with open("Tracking.json", "r") as f:
     info = json.load(f)
-    epnum = info["Main"]["EpNum"]
-    epname = info["Main"]["EpName"]
+    epnum = info["Main"]["Song"]
     linenum = info["Main"]["LineNum"]
-    seasonnum = info["Main"]["SeasonNum"]
+    seasonnum = info["Main"]["Album"]
+
+def splitlongquotes(quote):
+    quotenew = quote.split(".")
+
+    notweet = True
+    startplace = 0
+    while notweet:
+
+        pt1 = quotenew[startplace]
+        try:
+            pt2 = quotenew[startplace + 1]
+        except:
+            break
+        test = f"{pt1} {pt2}"
+        if len(test) <= 280:
+            quotenew[startplace] = test
+            quotenew.pop(startplace + 1)
+        if len(test) > 280:
+            quotenew[startplace] = f"{quotenew[startplace]}\n"
+            startplace += 1
+    output = ""
+    for quote in quotenew:
+        out = quote.replace("  ", ". ")
+        output = f"{output}{out}"
+    return output
 
 def prepare():
     global linenum
@@ -18,27 +42,26 @@ def prepare():
         currentline = script[linenum]
 
     if "UPDATELINE" in currentline:
-        currentseason = currentline.split()[1]
-        currentep = currentline.split()[2]
-        eptitle = " ".join(currentline.split()[3:])
+        currentalbum = currentline.split("-")[1]
+        currentsong = currentline.split("-")[2]
         with open("Tracking.json", "r") as f:
             info = json.load(f)
-            info["Main"]["EpNum"] = currentep
-            info["Main"]["SeasonNum"] = currentseason
-            info["Main"]["EpName"] = eptitle
+            info["Main"]["Song"] = currentsong
+            info["Main"]["Album"] = currentalbum
         with open("Tracking.json", "w") as w:
             json.dump(info, w, indent=4)
         linenum += 1
-        currentline = f"Next Episode: Season {currentseason} Episode {currentep} - {eptitle}"
+        currentline = f"Next song:{currentalbum}-{currentsong}"
         tweet.WriteTweet(currentline)
-    elif currentline == "\n":
+        tweet.Updater(currentalbum, currentsong)
+    elif currentline == "\n" or currentline == "" or currentline == " \n":
         linenum += 1
         prepare()
     else:
         if len(currentline) <= 280:
             tweet.WriteTweet(currentline)
         else:
-            currentline = currentline.replace(". ", ".\n")
+            currentline = splitlongquotes(currentline)
             with open(f"script.txt", "r") as f:
                 script = f.readlines()
                 script[linenum] = currentline
@@ -47,7 +70,7 @@ def prepare():
             with open("script.txt", "r") as f:
                 script = f.readlines()
                 currentline = script[linenum]
-            tweet.WriteTweet(currentline)
+                tweet.WriteTweet(currentline)
     with open("Tracking.json", "r") as f:
         info = json.load(f)
         info["Main"]["LineNum"] = linenum+1
