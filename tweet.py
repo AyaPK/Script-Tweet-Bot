@@ -2,7 +2,7 @@ from twython import Twython
 from twython import TwythonError
 import json
 import os
-tweetmode = False
+tweetmode = True
 class WriteTweet:
     def __init__(self, tweet):
         if tweetmode:
