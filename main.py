@@ -10,6 +10,31 @@ with open("Tracking.json", "r") as f:
     linenum = info["Main"]["LineNum"]
     seasonnum = info["Main"]["SeasonNum"]
 
+def splitlongquotes(quote):
+    quotenew = quote.split(".")
+
+    notweet = True
+    startplace = 0
+    while notweet:
+
+        pt1 = quotenew[startplace]
+        try:
+            pt2 = quotenew[startplace + 1]
+        except:
+            break
+        test = f"{pt1} {pt2}"
+        if len(test) <= 280:
+            quotenew[startplace] = test
+            quotenew.pop(startplace + 1)
+        if len(test) > 280:
+            quotenew[startplace] = f"{quotenew[startplace]}\n"
+            startplace += 1
+    output = ""
+    for quote in quotenew:
+        out = quote.replace("  ", ". ")
+        output = f"{output}{out}"
+    return output
+
 def prepare():
     global linenum
 
@@ -39,7 +64,7 @@ def prepare():
         if len(currentline) <= 280:
             tweet.WriteTweet(currentline)
         else:
-            currentline = currentline.replace(". ", ".\n")
+            currentline = splitlongquotes(currentline)
             with open(f"script.txt", "r") as f:
                 script = f.readlines()
                 script[linenum] = currentline
@@ -48,7 +73,7 @@ def prepare():
             with open("script.txt", "r") as f:
                 script = f.readlines()
                 currentline = script[linenum]
-            tweet.WriteTweet(currentline)
+                tweet.WriteTweet(currentline)
     with open("Tracking.json", "r") as f:
         info = json.load(f)
         info["Main"]["LineNum"] = linenum+1

@@ -2,7 +2,7 @@ from twython import Twython
 from twython import TwythonError
 import json
 import os
-tweetmode = True
+tweetmode = False
 class WriteTweet:
     def __init__(self, tweet):
         if tweetmode:
@@ -65,4 +65,4 @@ class Updater:
                 access_token,
                 access_token_secret
             )
-            twitter.update_profile(description=f"Currently on Season {season} Episode {ep}: {name}")
+            twitter.update_profile(description=f"A bot posting the entire US Office script one line at a time. Currently on Season {season}, Episode {ep} - {name}. Transcripts from officequotes.net")
